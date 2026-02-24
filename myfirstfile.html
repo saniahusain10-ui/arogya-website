@@ -1,0 +1,232 @@
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const PORT = 3000;
+
+/* =============================
+   DUMMY DATABASE
+============================= */
+
+const aarogyasriData = {
+  "AP1234567890": {
+    name: "Ravi Kumar",
+    age: 45,
+    gender: "Male",
+    district: "Anantapur",
+    mobile: "9876543210",
+    familyMembers: [
+      { name: "Lakshmi", age: 40, relation: "Wife" },
+      { name: "Kiran", age: 18, relation: "Son" }
+    ]
+  },
+  "AP9876543210": {
+    name: "Suma Devi",
+    age: 50,
+    gender: "Female",
+    district: "Kurnool",
+    mobile: "9123456780",
+    familyMembers: [
+      { name: "Ramesh", age: 52, relation: "Husband" },
+      { name: "Anjali", age: 22, relation: "Daughter" }
+    ]
+  }
+};
+
+const doctors = [
+  { name: "Dr. Reddy", specialization: "Cardiologist", distance: "2 km", rating: 4.5, aarogyasri: true },
+  { name: "Dr. Sharma", specialization: "General Physician", distance: "5 km", rating: 4.2, aarogyasri: false },
+  { name: "Dr. Meena", specialization: "Pulmonologist", distance: "3 km", rating: 4.8, aarogyasri: true }
+];
+
+/* =============================
+   API ROUTES
+============================= */
+
+// Aarogyasri lookup
+app.get("/api/aarogyasri/:cardNumber", (req, res) => {
+  const data = aarogyasriData[req.params.cardNumber];
+  if (data) {
+    res.json(data);
+  } else {
+    res.status(404).json({ message: "Card not found" });
+  }
+});
+
+// Get doctors
+app.get("/api/doctors", (req, res) => {
+  res.json(doctors);
+});
+
+// Book appointment
+app.post("/api/book", (req, res) => {
+  const { name, doctor } = req.body;
+  res.json({ message: `Appointment booked successfully for ${name} with ${doctor}` });
+});
+
+/* =============================
+   FRONTEND
+============================= */
+
+app.get("/", (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Arogya360 ConnectPro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: Arial; margin:0; background:#f4f9ff; }
+header { background: linear-gradient(90deg,#0077b6,#00b894); color:white; padding:20px; text-align:center; }
+section { padding:20px; }
+.card { background:white; padding:15px; margin:10px 0; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+button { background:#0077b6; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer; }
+button:hover { background:#00b894; }
+input, select { padding:6px; margin:5px 0; }
+hr { margin:30px 0; }
+</style>
+</head>
+<body>
+
+<header>
+<h2>🏥 Arogya360 ConnectPro</h2>
+<p>Healthcare Intelligence Platform</p>
+</header>
+
+<section>
+
+<h3>🪪 Aarogyasri Card Lookup</h3>
+<input type="text" id="cardNumber" placeholder="Enter Card Number">
+<button onclick="checkCard()">Check</button>
+<div id="cardResult"></div>
+
+<hr>
+
+<h3>👨‍⚕️ Nearest Doctors</h3>
+<div id="doctorList"></div>
+
+<hr>
+
+<h3>📅 Book Appointment</h3>
+<input type="text" id="patientName" placeholder="Your Name">
+<select id="doctorSelect"></select>
+<button onclick="bookAppointment()">Book</button>
+<div id="bookingResult"></div>
+
+<hr>
+
+<h3>🚑 Emergency Ambulance</h3>
+<button onclick="alert('Ambulance dispatched (Demo)!')">Call Ambulance</button>
+
+<hr>
+
+<h3>🩺 Symptom Checker</h3>
+<label><input type="checkbox" id="fever"> Fever</label>
+<label><input type="checkbox" id="cough"> Cough</label>
+<label><input type="checkbox" id="breath"> Breathing Issue</label>
+<br><br>
+<button onclick="checkSymptoms()">Check Risk</button>
+<div id="symptomResult"></div>
+
+</section>
+
+<script>
+
+// Load Doctors
+fetch("/api/doctors")
+.then(res => res.json())
+.then(data => {
+  const list = document.getElementById("doctorList");
+  const select = document.getElementById("doctorSelect");
+
+  data.forEach(doc => {
+    list.innerHTML +=
+      "<div class='card'>" +
+      "<strong>" + doc.name + "</strong><br>" +
+      "Specialization: " + doc.specialization + "<br>" +
+      "Distance: " + doc.distance + "<br>" +
+      "Rating: ⭐ " + doc.rating + "<br>" +
+      "Aarogyasri: " + (doc.aarogyasri ? "Yes" : "No") +
+      "</div>";
+
+    select.innerHTML +=
+      "<option value='" + doc.name + "'>" + doc.name + "</option>";
+  });
+});
+
+// Check Card
+function checkCard() {
+  const card = document.getElementById("cardNumber").value;
+
+  fetch("/api/aarogyasri/" + card)
+  .then(res => res.json())
+  .then(data => {
+    let family = "";
+    data.familyMembers.forEach(f => {
+      family += "<li>" + f.name + " (" + f.relation + ", " + f.age + ")</li>";
+    });
+
+    document.getElementById("cardResult").innerHTML =
+      "<div class='card'>" +
+      "<strong>Name:</strong> " + data.name + "<br>" +
+      "<strong>Age:</strong> " + data.age + "<br>" +
+      "<strong>Gender:</strong> " + data.gender + "<br>" +
+      "<strong>District:</strong> " + data.district + "<br>" +
+      "<strong>Mobile:</strong> " + data.mobile + "<br>" +
+      "<strong>Family Members:</strong><ul>" + family + "</ul>" +
+      "</div>";
+  })
+  .catch(() => {
+    document.getElementById("cardResult").innerHTML =
+      "<p style='color:red;'>Card not found</p>";
+  });
+}
+
+// Booking
+function bookAppointment() {
+  const name = document.getElementById("patientName").value;
+  const doctor = document.getElementById("doctorSelect").value;
+
+  fetch("/api/book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, doctor })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("bookingResult").innerText = data.message;
+  });
+}
+
+// Symptom Checker
+function checkSymptoms() {
+  const fever = document.getElementById("fever").checked;
+  const cough = document.getElementById("cough").checked;
+  const breath = document.getElementById("breath").checked;
+
+  let result = "";
+
+  if (breath) {
+    result = "🔴 High Risk - Visit Hospital Immediately";
+  } else if (fever && cough) {
+    result = "🟡 Moderate Risk - Consult Doctor";
+  } else {
+    result = "🟢 Low Risk - Home Care";
+  }
+
+  document.getElementById("symptomResult").innerText = result;
+}
+
+</script>
+
+</body>
+</html>
+  `);
+});
+
+app.listen(PORT, () => {
+  console.log("Server running at http://localhost:" + PORT);
+});

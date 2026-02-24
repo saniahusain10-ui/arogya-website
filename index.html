@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Health Risk Calculator</title>
+</head>
+<body>
+
+<h2>Health Risk Calculator</h2>
+
+Age: <input type="number" id="age"><br><br>
+Weight (kg): <input type="number" id="weight"><br><br>
+Height (cm): <input type="number" id="height"><br><br>
+Blood Pressure: <input type="number" id="bp"><br><br>
+Sugar Level: <input type="number" id="sugar"><br><br>
+
+<button onclick="calculateRisk()">Calculate</button>
+
+<p id="bmiResult"></p>
+<p id="riskResult"></p>
+
+<script>
+function calculateRisk() {
+    let age = parseInt(document.getElementById("age").value);
+    let weight = parseFloat(document.getElementById("weight").value);
+    let height = parseFloat(document.getElementById("height").value) / 100;
+    let bp = parseInt(document.getElementById("bp").value);
+    let sugar = parseInt(document.getElementById("sugar").value);
+
+    let bmi = weight / (height * height);
+    let risk = "Low";
+
+    if (bmi > 30 || bp > 140 || sugar > 180) {
+        risk = "High";
+    } else if (bmi > 25 || bp > 130 || sugar > 140) {
+        risk = "Medium";
+    }
+
+    document.getElementById("bmiResult").innerText = "BMI: " + bmi.toFixed(2);
+    document.getElementById("riskResult").innerText = "Risk Level: " + risk;
+}
+</script>
+
+</body>
+</html>
