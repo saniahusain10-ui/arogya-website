@@ -1,42 +1,188 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Health Risk Calculator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechArogya | Arogya360 ConnectPro</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f9fb;
+}
+
+header {
+    background: linear-gradient(90deg, #0077b6, #00b894);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+section {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+button {
+    background: #0077b6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #00b894;
+}
+
+input, select {
+    padding: 8px;
+    margin: 5px 0;
+    width: 90%;
+}
+
+footer {
+    background: #023e8a;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Health Risk Calculator</h2>
+<header>
+    <div class="logo">🩺 AC | TechArogya</div>
+    <h1>Arogya360 ConnectPro</h1>
+    <p>Integrated Healthcare Intelligence Platform</p>
+</header>
 
-Age: <input type="number" id="age"><br><br>
-Weight (kg): <input type="number" id="weight"><br><br>
-Height (cm): <input type="number" id="height"><br><br>
-Blood Pressure: <input type="number" id="bp"><br><br>
-Sugar Level: <input type="number" id="sugar"><br><br>
+<section>
+<h2>Our Features</h2>
 
-<button onclick="calculateRisk()">Calculate</button>
+<div class="features">
 
-<p id="bmiResult"></p>
-<p id="riskResult"></p>
+<!-- Doctor Locator -->
+<div class="card">
+<h3>📍 Nearest Doctor Locator</h3>
+<p>Dr. Ramesh (General Physician) - 2.3 km</p>
+<p>City Care Hospital - 5 km</p>
+<button onclick="alert('Live GPS integration coming soon!')">Find More</button>
+</div>
+
+<!-- Government Scheme -->
+<div class="card">
+<h3>🏥 Aarogyasri Scheme Support</h3>
+<p>Hospitals accepting government schemes:</p>
+<ul style="text-align:left;">
+<li>Sunrise Hospital ⭐ 4.5</li>
+<li>LifeCare Medical ⭐ 4.2</li>
+</ul>
+<button onclick="alert('Scheme eligibility check coming soon!')">Check Eligibility</button>
+</div>
+
+<!-- Ratings -->
+<div class="card">
+<h3>⭐ Hospital Ratings</h3>
+<p>Sunrise Hospital - 4.5/5</p>
+<p>Green Valley Clinic - 4.1/5</p>
+<button onclick="alert('Review system coming soon!')">View Reviews</button>
+</div>
+
+<!-- Appointment Booking -->
+<div class="card">
+<h3>📅 Book Appointment</h3>
+<select>
+<option>Select Doctor</option>
+<option>Dr. Ramesh</option>
+<option>Dr. Priya</option>
+</select><br>
+<input type="date"><br>
+<button onclick="alert('Appointment booked successfully!')">Book Now</button>
+</div>
+
+<!-- Ambulance -->
+<div class="card">
+<h3>🚑 Emergency Ambulance</h3>
+<p>24/7 Emergency Response</p>
+<button onclick="alert('Ambulance dispatched! (Demo)')">Call Ambulance</button>
+</div>
+
+<!-- Symptom Checker -->
+<div class="card">
+<h3>🧠 Early Symptom Checker</h3>
+
+<label><input type="checkbox" id="fever"> Fever</label><br>
+<label><input type="checkbox" id="cough"> Cough</label><br>
+<label><input type="checkbox" id="breath"> Breathing Difficulty</label><br>
+
+<button onclick="checkSymptoms()">Check Risk</button>
+<p id="result"></p>
+</div>
+
+</div>
+</section>
+
+<footer>
+© 2026 TechArogya | Arogya360 ConnectPro MVP
+</footer>
 
 <script>
-function calculateRisk() {
-    let age = parseInt(document.getElementById("age").value);
-    let weight = parseFloat(document.getElementById("weight").value);
-    let height = parseFloat(document.getElementById("height").value) / 100;
-    let bp = parseInt(document.getElementById("bp").value);
-    let sugar = parseInt(document.getElementById("sugar").value);
+function checkSymptoms() {
+    let fever = document.getElementById("fever").checked;
+    let cough = document.getElementById("cough").checked;
+    let breath = document.getElementById("breath").checked;
 
-    let bmi = weight / (height * height);
-    let risk = "Low";
+    let score = 0;
+    if (breath) score += 3;
+    if (fever) score += 1;
+    if (cough) score += 1;
 
-    if (bmi > 30 || bp > 140 || sugar > 180) {
-        risk = "High";
-    } else if (bmi > 25 || bp > 130 || sugar > 140) {
-        risk = "Medium";
+    let result = document.getElementById("result");
+
+    if (score >= 3) {
+        result.innerHTML = "🔴 High Risk - Immediate Medical Attention Required";
+        result.style.color = "red";
     }
-
-    document.getElementById("bmiResult").innerText = "BMI: " + bmi.toFixed(2);
-    document.getElementById("riskResult").innerText = "Risk Level: " + risk;
+    else if (score == 2) {
+        result.innerHTML = "🟡 Moderate Risk - Consult Doctor";
+        result.style.color = "orange";
+    }
+    else {
+        result.innerHTML = "🟢 Low Risk - Monitor at Home";
+        result.style.color = "green";
+    }
 }
 </script>
 
